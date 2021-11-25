@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+    web:
+        build: .
+        command: uvicorn core.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
+        volumes:
+          - .:/code
+        ports:
+          - 8000:8000
+        env_file:
+          - .env
+        depends_on:
+          - chatlet_db
+
+    chatlet_db:
+        image: mongo:5.0.2
+        ports:
+          - "27017:27017"
+        logging:
+          driver: none
+        volumes:
+          - chatlet_data_container:/data/db
+
+volumes:
+    chatlet_data_container:
