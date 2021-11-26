@@ -16,8 +16,7 @@ class Settings(BaseSettings):
     db_name: str = os.getenv('MONGODB_DATABASE_NAME')
 
     # Security settings
-    salt: bytes = os.getenv('SALT').encode()
-    auth_jwt_secret_key: str = os.getenv('SECRET_KEY')
+    authjwt_secret_key: str = os.getenv('SECRET_KEY')
 
     # FastMail SMTP settings
     mail_console: bool = os.getenv('MAIL_CONSOLE', default=False)

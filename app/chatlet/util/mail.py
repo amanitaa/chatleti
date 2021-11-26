@@ -17,7 +17,7 @@ mail = FastMail(mail_config)
 
 
 async def send_password_reset(email: str, token: str):
-    url = CONFIG.root_url + "/password/reset/" + token
+    url = "http://0.0.0.0:8000/password/reset/" + token
     if not CONFIG.mail_console:
         message = MessageSchema(
             recipients=[email],
