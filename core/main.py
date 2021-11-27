@@ -1,21 +1,17 @@
-import json
-
 import motor.motor_asyncio
 
-from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, Depends
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from beanie import init_beanie
 from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
 
 from app import router
-from app.chatlet.models.personal_room import PersonalMessage
+from app.chatlet.consumers import sio_app
 from app.chatlet.models.room import Room
 from app.chatlet.models.user import User
-from app.chatlet.util.queries import get_current_user
 from .config import Settings, CONFIG
 from . import config
-from .connection_manager import ConnectionManager
 
 
 def get_app():
@@ -40,7 +36,7 @@ def jwt_exception_handler(request: Request, exc: AuthJWTException):
 @app.on_event('startup')
 async def app_init():
     client = motor.motor_asyncio.AsyncIOMotorClient(CONFIG.db_url)
-    await init_beanie(database=client[str(CONFIG.db_name)], document_models=[User, Room, PersonalMessage])
+    await init_beanie(database=client[str(CONFIG.db_name)], document_models=[User, Room])
 
 
 # manager = ConnectionManager()
@@ -58,3 +54,5 @@ async def app_init():
 #             await manager.send_personal_message(message, websocket)
 #     except WebSocketDisconnect:
 #         manager.disconnect(websocket)
+
+app.mount('/ws', sio_app)

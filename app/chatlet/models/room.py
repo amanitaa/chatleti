@@ -13,15 +13,12 @@ class Message(BaseModel):
     sent_at: datetime.datetime = datetime.datetime.now()
 
 
-class Room(Document):
-    theme: str
-    created_at: datetime.datetime = datetime.datetime.now()
-    room_name: str
-    members: List[UserOut] = None
-    messages: List[Message] = None
-
-
 class RoomsOut(BaseModel):
     theme: str
     room_name: str
     members: List[UserOut]
+    created_at: datetime.datetime = datetime.datetime.now()
+
+
+class Room(Document, RoomsOut):
+    messages: List[Message] = None

@@ -28,5 +28,3 @@ async def reset_password(
     user.password = hash_password(password)
     await user.save()
     return user
-
-

@@ -24,4 +24,3 @@ async def get_chat():
 @router.get('/get/{chat_id}', response_model=RoomsOut)
 async def get_chat_by_id(chat: Room = Depends(get_room)):
     return chat
-
