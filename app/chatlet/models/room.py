@@ -19,3 +19,9 @@ class Room(Document):
     room_name: str
     members: List[UserOut] = None
     messages: List[Message] = None
+
+
+class RoomsOut(BaseModel):
+    theme: str
+    room_name: str
+    members: List[UserOut]

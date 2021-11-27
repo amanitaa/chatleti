@@ -3,7 +3,8 @@ from typing import List
 from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
 
-from app.chatlet.models.room import Room
+from app.chatlet.models.room import Room, RoomsOut
+from app.chatlet.util.queries import get_specific_room
 
 router = APIRouter(prefix='/chat', tags=['Chat'])
 
@@ -15,6 +16,12 @@ async def create_chat(room: Room, auth: AuthJWT = Depends()):
     return room
 
 
-@router.get('/get', response_model=List[Room])
+@router.get('/get', response_model=List[RoomsOut])
 async def get_chat():
     return await Room.find_all().to_list()
+
+
+@router.get('/get/{chat_id}', response_model=RoomsOut)
+async def get_chat_by_id(chat: Room = Depends(get_specific_room)):
+    return chat
+

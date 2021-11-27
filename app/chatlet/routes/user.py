@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Response
 from fastapi_jwt_auth import AuthJWT
 
 from app.chatlet.models.user import User, UserUpdate, UserOut
-from app.chatlet.util.current_user import get_current_user
+from app.chatlet.util.queries import get_current_user
 
 router = APIRouter(prefix='/user', tags=['User'])
 
