@@ -1,3 +1,5 @@
+import json
+
 import motor.motor_asyncio
 
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, Depends
@@ -7,9 +9,10 @@ from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
 
 from app import router
+from app.chatlet.models.personal_room import PersonalMessage
 from app.chatlet.models.room import Room
 from app.chatlet.models.user import User
-from app.chatlet.util.current_user import get_current_user
+from app.chatlet.util.queries import get_current_user
 from .config import Settings, CONFIG
 from . import config
 from .connection_manager import ConnectionManager
@@ -37,20 +40,21 @@ def jwt_exception_handler(request: Request, exc: AuthJWTException):
 @app.on_event('startup')
 async def app_init():
     client = motor.motor_asyncio.AsyncIOMotorClient(CONFIG.db_url)
-    await init_beanie(database=client[str(CONFIG.db_name)], document_models=[User, Room])
+    await init_beanie(database=client[str(CONFIG.db_name)], document_models=[User, Room, PersonalMessage])
 
 
-manager = ConnectionManager()
-
-
-@app.websocket('/ws/{user}')
-async def ws_endpoint(websocket: WebSocket, user: User = Depends(get_current_user)):
-    await manager.connect(websocket)
-    try:
-        while True:
-            data = await websocket.receive_text()
-            await manager.send_personal_message(data, websocket)
-            await manager.broadcast(f'{user} says: {data}')
-    except WebSocketDisconnect:
-        manager.disconnect(websocket)
-        await manager.broadcast(f'{user} left chat')
+# manager = ConnectionManager()
+#
+#
+# @app.websocket('/ws/{user}')
+# async def ws_endpoint(websocket: WebSocket, user: User = Depends(get_current_user)):
+#     await manager.connect(websocket)
+#     try:
+#         while True:
+#             data = await websocket.receive_text()
+#             message = PersonalMessage(sender=user, **json.loads(data))
+#             message_in_db = PersonalMessage(sender=user, receiver=message.receiver, message=message.message)
+#             await message_in_db.save()
+#             await manager.send_personal_message(message, websocket)
+#     except WebSocketDisconnect:
+#         manager.disconnect(websocket)

@@ -7,7 +7,7 @@ from app.chatlet.models.room import Room
 from app.chatlet.models.user import User
 
 
-async def get_specific_room(chat_id: str) -> Room:
+async def get_room(chat_id: str) -> Room:
     try:
         chat = await Room.get(PydanticObjectId(chat_id))
     except (ValueError, beanie.exceptions.DocumentNotFound):

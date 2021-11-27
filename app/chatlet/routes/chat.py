@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
 
 from app.chatlet.models.room import Room, RoomsOut
-from app.chatlet.util.queries import get_specific_room
+from app.chatlet.util.queries import get_room
 
 router = APIRouter(prefix='/chat', tags=['Chat'])
 
@@ -22,6 +22,6 @@ async def get_chat():
 
 
 @router.get('/get/{chat_id}', response_model=RoomsOut)
-async def get_chat_by_id(chat: Room = Depends(get_specific_room)):
+async def get_chat_by_id(chat: Room = Depends(get_room)):
     return chat
 
