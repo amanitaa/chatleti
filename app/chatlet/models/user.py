@@ -20,7 +20,7 @@ class UserOut(BaseModel):
 
 
 class User(Document, UserOut):
-    password: bytes
+    password: str
 
     @classmethod
     async def by_email(cls, email: str) -> "User":
