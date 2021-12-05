@@ -21,7 +21,3 @@ class UserOut(BaseModel):
 
 class User(Document, UserOut):
     password: str
-
-    @classmethod
-    async def by_email(cls, email: str) -> "User":
-        return await cls.find_one(cls.email == email)

@@ -13,7 +13,7 @@ router = APIRouter(prefix='/password', tags=['Password'])
 async def forgot_password(
         email: EmailStr = Body(..., embed=True), auth: AuthJWT = Depends()
 ):
-    user = await User.by_email(email)
+    user = await User.find_one(email == User.email)
     token = auth.create_access_token(user.email)
     await send_password_reset(email, token)
     return Response(status_code=200)
@@ -24,7 +24,7 @@ async def reset_password(
         token: str, password: str = Body(..., embed=True), auth: AuthJWT = Depends()
 ):
     auth._token = token
-    user = await User.by_email(auth.get_jwt_subject())
+    user = await User.find_one(auth.get_jwt_subject() == User.email)
     user.password = hash_password(password)
     await user.save()
     return user
