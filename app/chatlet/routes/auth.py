@@ -10,8 +10,8 @@ router = APIRouter(prefix='/auth', tags=['Auth'])
 
 @router.post('/login')
 async def login(user_auth: UserAuth, auth: AuthJWT = Depends()):
-    user = await User.by_email(user_auth.email)
-    if user is not None and hash_password(user_auth.password) != user.password:
+    user = await User.find_one(user_auth.email == User.email)
+    if user is not None and hash_password(user_auth.password) == user.password:
         access_token = auth.create_access_token(subject=user_auth.email)
         # refresh_token = auth.create_refresh_token(subject=user_auth.email)
         # return RefreshToken(access_token=access_token, refresh_token=refresh_token)
