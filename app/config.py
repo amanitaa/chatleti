@@ -1,4 +1,5 @@
 from functools import lru_cache
+from typing import Union
 import os
 import pathlib
 
@@ -31,7 +32,7 @@ class TestingConfig(Config):
 
 
 @lru_cache()
-def get_config() -> TestingConfig | Config:
+def get_config() -> Union[TestingConfig, Config]:
     config = {"test": TestingConfig, "dev": Config}
     get_conf_name = os.environ.get("ENVIRONMENT")
     return config.get(get_conf_name)()
