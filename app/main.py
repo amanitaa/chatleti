@@ -1,10 +1,8 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from beanie import init_beanie
-from fastapi_jwt_auth.exceptions import AuthJWTException
 
 from app import router
 from app.chatlet.models.room import Room
@@ -16,10 +14,10 @@ from . import config
 def get_app() -> FastAPI:
     application = FastAPI(title=config.PROJECT_NAME, version=config.VERSION)
     application.include_router(router)
-    
-    application.middleware(
+
+    application.add_middleware(
         CORSMiddleware,
-        allow_origin=["*"],
+        allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"]
@@ -28,12 +26,8 @@ def get_app() -> FastAPI:
     @application.on_event("startup")
     async def init_database() -> None:
         client = AsyncIOMotorClient(CONFIG.db_url)
-        await init_beanie(client=client[str(CONFIG.db_name)], document_models=[User, Room])
+        await init_beanie(database=client[str(CONFIG.db_name)], document_models=[User, Room])
 
-
-    @app.exception_handler(AuthJWTException)
-    def jwt_exception_handler(request: Request, exc: AuthJWTException):
-        return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
     return application
 
 
