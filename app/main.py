@@ -7,12 +7,12 @@ from beanie import init_beanie
 from app import router
 from app.chatlet.models.room import Room
 from app.chatlet.models.user import User
-from .config import CONFIG
+from .config import settings
 from . import config
 
 
 def get_app() -> FastAPI:
-    application = FastAPI(title=config.PROJECT_NAME, version=config.VERSION)
+    application = FastAPI(title=config.PROJECT_NAME)
     application.include_router(router)
 
     application.add_middleware(
@@ -25,9 +25,10 @@ def get_app() -> FastAPI:
 
     @application.on_event("startup")
     async def init_database() -> None:
-        client = AsyncIOMotorClient(CONFIG.db_url)
-        await init_beanie(database=client[str(CONFIG.db_name)], document_models=[User, Room])
-
+        client = AsyncIOMotorClient(settings.MONGODB_URI)
+        await init_beanie(
+            database=client[str(settings.DATABASE_NAME)], document_models=[User, Room]
+        )
     return application
 
 

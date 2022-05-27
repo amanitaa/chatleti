@@ -1,14 +1,14 @@
 from fastapi_mail import FastMail, ConnectionConfig, MessageSchema
 
-from app.config import CONFIG
+from app.config import settings
 
 
 mail_config = ConnectionConfig(
-    MAIL_USERNAME=CONFIG.mail_username,
-    MAIL_PASSWORD=CONFIG.mail_password,
-    MAIL_FROM=CONFIG.mail_sender,
-    MAIL_PORT=CONFIG.mail_port,
-    MAIL_SERVER=CONFIG.mail_server,
+    MAIL_USERNAME=settings.MAIL_USERNAME,
+    MAIL_PASSWORD=settings.MAIL_PASSWORD,
+    MAIL_FROM=settings.MAIL_SENDER,
+    MAIL_PORT=settings.MAIL_PORT,
+    MAIL_SERVER=settings.MAIL_SERVER,
     MAIL_TLS=True,
     MAIL_SSL=False,
     USE_CREDENTIALS=True,
@@ -19,7 +19,7 @@ mail = FastMail(mail_config)
 
 async def send_password_reset(email: str, token: str):
     url = "http://0.0.0.0:8000/password/reset/" + token
-    if not CONFIG.mail_console:
+    if not settings.MAIL_CONSOLE:
         message = MessageSchema(
             recipients=[email],
             subject='password reset',

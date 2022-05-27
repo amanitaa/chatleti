@@ -1,30 +1,40 @@
+from functools import lru_cache
 import os
+import pathlib
 
-from pydantic import BaseSettings
-
-PROJECT_NAME = 'Chatlet'
-VERSION = '0.0.0'
+PROJECT_NAME = "Chatlet"
 
 
-class Settings(BaseSettings):
-    # Dev settings
-    environment: str = os.getenv('ENVIRONMENT')
-    testing: bool = os.getenv('TESTING')
+class Config:
+    BASE_DIR: pathlib.Path = pathlib.Path(__file__).parent
 
-    # Mongo settings
-    db_url: str = os.getenv('MONGODB_URL')
-    db_name: str = os.getenv('MONGODB_DATABASE_NAME')
+    # MongoDB settings
+    MONGODB_URI: str = os.environ.get("MONGODB_URI")
+    DATABASE_NAME: str = os.environ.get("DATABASE_NAME")
 
     # Security settings
-    authjwt_secret_key: str = os.getenv('SECRET_KEY')
+    JWT_SECRET_KEY: str = os.environ.get("SECRET_KEY")
 
     # FastMail SMTP settings
-    mail_console: bool = os.getenv('MAIL_CONSOLE', default=False)
-    mail_server = os.getenv('MAIL_SERVER', default='smtp.server.io')
-    mail_port: int = os.getenv('MAIL_PORT', default=587)
-    mail_username: str = os.getenv('MAIL_USERNAME', default='')
-    mail_password: str = os.getenv('MAIL_PASSWORD', default='')
-    mail_sender: str = os.getenv('MAIL_SENDER', default='noreply@chatlet.io')
+    MAIL_CONSOLE: bool = os.environ.get("MAIL_CONSOLE", default=False)
+    MAIL_SERVER = os.environ.get("MAIL_SERVER", default="smtp.server.io")
+    MAIL_PORT: int = os.environ.get("MAIL_PORT", default=587)
+    MAIL_USERNAME: str = os.environ.get("MAIL_USERNAME", default="")
+    MAIL_PASSWORD: str = os.environ.get("MAIL_PASSWORD", default="")
+    MAIL_SENDER: str = os.environ.get("MAIL_SENDER", default="noreply@chatlet.io")
 
 
-CONFIG = Settings()
+class TestingConfig(Config):
+    DATABASE_NAME: str = "TestChatlet"
+    JWT_SECRET_KEY: str = "secret"
+    PROJECT_NAME: str = "TestChatlet"
+
+
+@lru_cache()
+def get_config() -> TestingConfig | Config:
+    config = {"test": TestingConfig, "dev": Config}
+    get_conf_name = os.environ.get("ENVIRONMENT")
+    return config.get(get_conf_name)()
+
+
+settings = get_config()
